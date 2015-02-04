@@ -1,0 +1,22 @@
+{
+    "name": "boris/imgscrape",
+    "type": "library",
+    "description": "Simple image scraper from remote URL to get the largest image",
+    "authors": [
+        {
+            "name": "Boris Pavlov",
+            "email": "borispavlov0@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "~5.0",
+        "monolog/monolog": "1.11.*@dev"
+    },
+    "autoload": {
+        "psr-0": {
+            "Boris\\ImgScrape\\": ""
+        },
+        "psr-4": {"": "src/"}
+    },
+    "target-dir": "Boris/ImgScrape"
+}
