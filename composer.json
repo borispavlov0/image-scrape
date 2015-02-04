@@ -14,9 +14,8 @@
     },
     "autoload": {
         "psr-0": {
-            "Boris\\ImgScrape\\": ""
-        },
-        "psr-4": {"": "src/"}
+            "Boris\\ImgScrape\\": "src/"
+        }
     },
     "target-dir": "Boris/ImgScrape"
 }

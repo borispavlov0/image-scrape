@@ -2,11 +2,11 @@
 
 namespace Boris\ImgScrape;
 
-    /**
-     * Scraper.php
-     * Author: Boris Pavlov <borispavlov0 at gmail.com>
-     * Date: 6-Dec-2014
-     */
+/**
+ * Scraper.php
+ * Author: Boris Pavlov <borispavlov0 at gmail.com>
+ * Date: 6-Dec-2014
+ */
 
 /**
  * Class used to analyze remote images and URLs
@@ -67,9 +67,11 @@ class Scraper
      */
     public function getAcceptedTypes()
     {
-        return array_map(function ($value) {
-            return "image/" . $value;
-        }, $this->config['acceptedTypes']
+        return array_map(
+            function ($value) {
+                return "image/" . $value;
+            },
+            $this->config['acceptedTypes']
         );
     }
 
