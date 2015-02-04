@@ -2,12 +2,11 @@
 
 namespace Boris\ImgScrape;
 
-
-/**
- * Scraper.php
- * Author: Boris Pavlov <borispavlov0 at gmail.com>
- * Date: 6-Dec-2014
- */
+    /**
+     * Scraper.php
+     * Author: Boris Pavlov <borispavlov0 at gmail.com>
+     * Date: 6-Dec-2014
+     */
 
 /**
  * Class used to analyze remote images and URLs
@@ -37,24 +36,6 @@ class Scraper
             $this->config = array_replace_recursive($this->config, $config);
         }
         $this->logger = new Logger($this->config['logger']);
-    }
-
-    /**
-     * Downloads an element and returns its size
-     *
-     * @param string $url
-     *
-     * @return int
-     */
-    public function getDataAsString($url)
-    {
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_VERBOSE, 0);
-        $data = curl_exec($curl);
-        curl_close($curl);
-
-        return sizeof($data);
     }
 
     /**
@@ -139,7 +120,7 @@ class Scraper
                     $urlInfo = parse_url($url);
                     if (substr($value, 0, 2) == '//') {
                         $this->logger->log(
-                            'debug', "Returning Image Source (Fixed): " . $urlInfo['scheme'] . ":" . $value . "\n"
+                            Logger::DEBUG, "Returning Image Source (Fixed): " . $urlInfo['scheme'] . ":" . $value . "\n"
                         );
 
                         $value = $urlInfo['scheme'] . ":" . $value;
@@ -147,7 +128,7 @@ class Scraper
                         return;
                     } elseif (substr($value, 0, 1) == "/") {
                         $this->logger->log(
-                            'debug',
+                            Logger::DEBUG,
                             "Returning Image Source (Fixed): " .
                             $urlInfo['scheme'] . "://" . $urlInfo['host'] . $value . "\n"
                         );
@@ -155,12 +136,12 @@ class Scraper
 
                         return;
                     }
-                    $this->logger->log('debug', "Unsetting: " . $value . "\n");
+                    $this->logger->log(Logger::DEBUG, "Unsetting: " . $value . "\n");
                     $value = false;
 
                     return;
                 }
-                $this->logger->log('debug', "Returning Image Source (valid URL): " . $value . "\n");
+                $this->logger->log(Logger::DEBUG, "Returning Image Source (valid URL): " . $value . "\n");
             });
 
         return array_filter($matches[1]);
@@ -176,13 +157,13 @@ class Scraper
     public function getLargestImageUrl($url)
     {
         if ($this->isImage($url)) {
-            $this->logger->log('info', "Picture URL is image (" . $url . "). \n");
+            $this->logger->log(Logger::INFO, "Picture URL is image (" . $url . "). \n");
             $this->count++;
 
             return $url;
         }
         if ($this->config['imageLinksOnly']) {
-            $this->logger->log('notice', "Only image links allowed, skipping url " . $url);
+            $this->logger->log(Logger::NOTICE, "Only image links allowed, skipping url " . $url);
 
             return null;
         }
@@ -231,5 +212,23 @@ class Scraper
         curl_close($ch);
 
         return $html;
+    }
+
+    /**
+     * Downloads an element and returns its size
+     *
+     * @param string $url
+     *
+     * @return int
+     */
+    private function getDataAsString($url)
+    {
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_VERBOSE, 0);
+        $data = curl_exec($curl);
+        curl_close($curl);
+
+        return sizeof($data);
     }
 }
