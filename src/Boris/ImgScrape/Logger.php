@@ -13,6 +13,10 @@ use Monolog\Logger as Monologger;
  */
 class Logger
 {
+    const INFO = Monologger::INFO;
+    const NOTICE = Monologger::NOTICE;
+    const DEBUG = Monologger::DEBUG;
+
     /**
      *
      * @var array
@@ -88,15 +92,11 @@ class Logger
      *
      * @param string $level
      * @param string $message
-     *
-     * @return null
      */
     public function log($level, $message)
     {
-        if (!$this->config['enabled']) {
-            return;
+        if ($this->config['enabled']) {
+            $this->logger->log($level, $message);
         }
-
-        $this->logger->log($this->getMappedHandlerLevel($level), $message);
     }
 }
