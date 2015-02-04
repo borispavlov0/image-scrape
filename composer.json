@@ -2,6 +2,7 @@
     "name": "boris/imgscrape",
     "type": "library",
     "description": "Simple image scraper from remote URL to get the largest image",
+    "license": "MIT",
     "authors": [
         {
             "name": "Boris Pavlov",
@@ -16,6 +17,5 @@
         "psr-0": {
             "Boris\\ImgScrape\\": "src/"
         }
-    },
-    "target-dir": "Boris/ImgScrape"
+    }
 }
