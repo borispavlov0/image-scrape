@@ -102,7 +102,7 @@ class Scraper
             return $response->getHeader('Content-Length');
         }
 
-        $data = $this->getDataAsString($url);
+        $data = $this->getSizeFromUrl($url);
 
         return sizeof($data);
     }
@@ -188,13 +188,13 @@ class Scraper
      */
     private function getHtml($url)
     {
-        $response = $this->client->get($url,[
+        $response = $this->client->get($url, [
             'headers' => [
                 'User-Agent' => $this->config['user-agent']
             ]
         ]);
 
-        return (string)$response->getBody();
+        return (string) $response->getBody();
     }
 
     /**
@@ -204,15 +204,11 @@ class Scraper
      *
      * @return int
      */
-    private function getDataAsString($url)
+    private function getSizeFromUrl($url)
     {
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_VERBOSE, 0);
-        $data = curl_exec($curl);
-        curl_close($curl);
+        $response = $this->client->get($url);
 
-        return sizeof($data);
+        return $response->getBody()->getSize();
     }
 
     /**
@@ -267,7 +263,9 @@ class Scraper
                 $pictureUrl = $i;
             }
         }
-        $this->logger->log(Logger::INFO, "Returning picture url as '". (isset($pictureUrl) ? $pictureUrl: "NULL") ."'");
+        $this->logger->log(Logger::INFO, "Returning picture url as '" . (isset($pictureUrl)
+                ? $pictureUrl
+                : "NULL") . "'");
 
         return isset($pictureUrl)
             ? $pictureUrl
