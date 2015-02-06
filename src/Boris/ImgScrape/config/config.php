@@ -1,6 +1,7 @@
 <?php
 
-return ['imageLinksOnly' => true,
+return [
+    'imageLinksOnly' => false,
     'acceptedTypes' => [
         'jpeg',
         'jpg',
@@ -11,13 +12,16 @@ return ['imageLinksOnly' => true,
         'enabled' => true,
         'handlers' => [
             [
+                'dir' => __DIR__ . '/../../../../log/debug.log',
+                'level' => 'debug'
+            ],
+            [
                 'dir' => __DIR__ . '/../../../../log/main.log',
                 'level' => 'info'
             ],
-            [
-                'dir' => __DIR__ . '/../../../../log/debug.log',
-                'level' => 'debug'
-            ]
         ]
+    ],
+    'blacklist' => [
+        'www.reddit.com'
     ]
 ];
