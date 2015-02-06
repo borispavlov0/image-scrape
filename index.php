@@ -16,7 +16,7 @@ if (empty($response)) {
             'body' => [
                 'api_type' => 'json',
                 'user'     => 'some user',
-                'passwd'   => 'some password',
+                'passwd'   => 'some pass',
                 'rem'      => true
             ]
         ]
@@ -30,12 +30,12 @@ $hotPosts = $client
                 'X-Modhash' => $response['json']['data']['modhash']
             ],
             'query'   => [
-                'limit' => 10
+                'limit' => 5
             ]
         ])
     ->json();
 
-$scraper = new Scraper();
+$scraper = new Scraper($client);
 foreach ($hotPosts['data']['children'] as $post) {
     $url = $post['data']['url'];
     $pictureUrl = $scraper->getLargestImageUrl($url);

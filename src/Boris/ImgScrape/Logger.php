@@ -16,6 +16,7 @@ class Logger
     const INFO = Monologger::INFO;
     const NOTICE = Monologger::NOTICE;
     const DEBUG = Monologger::DEBUG;
+    const ERROR = Monologger::ERROR;
 
     /**
      *
@@ -80,6 +81,9 @@ class Logger
                 break;
             case 'notice':
                 return Monologger::NOTICE;
+                break;
+            case 'error':
+                return Monologger::ERROR;
                 break;
             case 'info':
             default:

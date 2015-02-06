@@ -7,6 +7,10 @@ namespace Boris\ImgScrape;
  * Author: Boris Pavlov <borispavlov0 at gmail.com>
  * Date: 6-Dec-2014
  */
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Message\Response;
+use GuzzleHttp\Url;
 
 /**
  * Class used to analyze remote images and URLs
@@ -23,19 +27,25 @@ class Scraper
      * @var array
      */
     private $config;
+    /**
+     * @var Client
+     */
+    private $client;
 
     /**
      * Default constructor. Please refer to the configuration reference for the format of $config
      *
-     * @param array $config
+     * @param Client $client
+     * @param array  $config
      */
-    public function __construct(array $config = null)
+    public function __construct(Client $client, array $config = null)
     {
         $this->config = require __DIR__ . '/config/config.php';
         if (is_array($config)) {
             $this->config = array_replace_recursive($this->config, $config);
         }
         $this->logger = new Logger($this->config['logger']);
+        $this->client = $client;
     }
 
     /**
@@ -47,14 +57,10 @@ class Scraper
      */
     public function isImage($url)
     {
-        $headers = get_headers($url);
+        $response = $this->headCall($url);
 
-        foreach ($headers as $h) {
-            $headerArray = explode(":", $h);
-
-            if ($headerArray[0] == 'Content-Type' && in_array(trim($headerArray[1]), $this->getAcceptedTypes())) {
-                return true;
-            }
+        if (in_array($response->getHeader('Content-Type'), $this->getAcceptedTypes())) {
+            return true;
         }
 
         return false;
@@ -85,20 +91,17 @@ class Scraper
      */
     public function getSize($url)
     {
-        $this->logger->log('debug', "Get headers: " . $url . "\n");
-        $headers = get_headers($url);
+        $this->logger->log(Logger::DEBUG, "Get headers: " . $url . "\n");
+        $response = $this->headCall($url);
 
-        $this->logger->log('debug', "Received headers: " . $url . "\n", $headers);
+        $this->logger->log(Logger::DEBUG, "Received headers: " . $url . "\n", json_encode($response->getHeaders()));
 
         $this->count++;
 
-        foreach ($headers as $h) {
-            $headerArray = explode(":", $h);
-
-            if ($headerArray[0] == 'Content-Length') {
-                return $headerArray[1];
-            }
+        if ($response->getHeader('Content-Length')) {
+            return $response->getHeader('Content-Length');
         }
+
         $data = $this->getDataAsString($url);
 
         return sizeof($data);
@@ -158,6 +161,9 @@ class Scraper
      */
     public function getLargestImageUrl($url)
     {
+        if ($this->isBlacklisted($url)) {
+            return null;
+        }
         if ($this->isImage($url)) {
             $this->logger->log(Logger::INFO, "Picture URL is image (" . $url . "). \n");
             $this->count++;
@@ -169,23 +175,8 @@ class Scraper
 
             return null;
         }
-        $images = $this->getImageSources($url);
-        $size = 0;
 
-        foreach ($images as $i) {
-
-            $imgSize = $this->getSize($i);
-            $this->count++;
-
-            if ($imgSize > $size) {
-                $size = $imgSize;
-                $pictureUrl = $i;
-            }
-        }
-
-        return isset($pictureUrl)
-            ? $pictureUrl
-            : null;
+        return $this->processImageArray($this->getImageSources($url));
     }
 
     /**
@@ -232,5 +223,64 @@ class Scraper
         curl_close($curl);
 
         return sizeof($data);
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return Response
+     */
+    private function headCall($url)
+    {
+        try {
+            return $this->client->head($url);
+        } catch (ClientException $e) {
+            $this->logger->log(Logger::ERROR, $e->getMessage());
+
+            return $e->getResponse();
+        }
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
+    private function isBlacklisted($url)
+    {
+        $url = Url::fromString($url);
+        if (in_array($url->getHost(), $this->config['blacklist'])) {
+            $this->logger->log(Logger::NOTICE, "Url is blacklisted: " . $url);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $images
+     *
+     * @return null
+     */
+    private function processImageArray($images = array())
+    {
+        $size = 0;
+
+        foreach ($images as $i) {
+
+            $imgSize = $this->getSize($i);
+            $this->count++;
+
+            if ($imgSize > $size) {
+                $size = $imgSize;
+                $pictureUrl = $i;
+            }
+        }
+        $this->logger->log(Logger::INFO, "Returning picture url as '". isset($pictureUrl) ? $pictureUrl: "NULL" ."'");
+
+        return isset($pictureUrl)
+            ? $pictureUrl
+            : null;
     }
 }
