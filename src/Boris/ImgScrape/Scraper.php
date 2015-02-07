@@ -102,7 +102,7 @@ class Scraper
             return $response->getHeader('Content-Length');
         }
 
-        $data = $this->getDataAsString($url);
+        $data = $this->getSizeFromUrl($url);
 
         return sizeof($data);
     }
@@ -188,23 +188,13 @@ class Scraper
      */
     private function getHtml($url)
     {
-        // create curl resource
-        $ch = curl_init();
+        $response = $this->client->get($url, [
+            'headers' => [
+                'User-Agent' => $this->config['user-agent']
+            ]
+        ]);
 
-        // set url
-        curl_setopt($ch, CURLOPT_URL, $url);
-
-        //return the transfer as a string
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, 0);
-        curl_setopt($ch, CURLOPT_USERAGENT,
-            'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20141220 Firefox/2.0.0.13');
-
-        // $output contains the output string
-        $html = curl_exec($ch);
-        curl_close($ch);
-
-        return $html;
+        return (string) $response->getBody();
     }
 
     /**
@@ -214,15 +204,11 @@ class Scraper
      *
      * @return int
      */
-    private function getDataAsString($url)
+    private function getSizeFromUrl($url)
     {
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_VERBOSE, 0);
-        $data = curl_exec($curl);
-        curl_close($curl);
+        $response = $this->client->get($url);
 
-        return sizeof($data);
+        return $response->getBody()->getSize();
     }
 
     /**
@@ -267,6 +253,8 @@ class Scraper
     {
         $size = 0;
 
+        $pictureUrl = null;
+
         foreach ($images as $i) {
 
             $imgSize = $this->getSize($i);
@@ -277,10 +265,10 @@ class Scraper
                 $pictureUrl = $i;
             }
         }
-        $this->logger->log(Logger::INFO, "Returning picture url as '". isset($pictureUrl) ? $pictureUrl: "NULL" ."'");
+        $this->logger->log(Logger::INFO, "Returning picture url as '" . ($pictureUrl
+                ? $pictureUrl
+                : "NULL") . "'");
 
-        return isset($pictureUrl)
-            ? $pictureUrl
-            : null;
+        return $pictureUrl;
     }
 }
