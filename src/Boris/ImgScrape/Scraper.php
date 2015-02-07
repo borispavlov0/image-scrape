@@ -253,6 +253,8 @@ class Scraper
     {
         $size = 0;
 
+        $pictureUrl = null;
+
         foreach ($images as $i) {
 
             $imgSize = $this->getSize($i);
@@ -263,12 +265,10 @@ class Scraper
                 $pictureUrl = $i;
             }
         }
-        $this->logger->log(Logger::INFO, "Returning picture url as '" . (isset($pictureUrl)
+        $this->logger->log(Logger::INFO, "Returning picture url as '" . ($pictureUrl
                 ? $pictureUrl
                 : "NULL") . "'");
 
-        return isset($pictureUrl)
-            ? $pictureUrl
-            : null;
+        return $pictureUrl;
     }
 }
