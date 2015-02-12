@@ -36,16 +36,18 @@ class Scraper
      * Default constructor. Please refer to the configuration reference for the format of $config
      *
      * @param Client $client
+     * @param Logger $logger
      * @param array  $config
      */
-    public function __construct(Client $client, array $config = null)
+    public function __construct(Client $client, Logger $logger, array $config = null)
     {
         $this->config = require __DIR__ . '/config/config.php';
         if (is_array($config)) {
             $this->config = array_replace_recursive($this->config, $config);
         }
-        $this->logger = new Logger($this->config['logger']);
+//        $this->logger = new Logger($this->config['logger']);
         $this->client = $client;
+        $this->logger = $logger;
     }
 
     /**
@@ -66,20 +68,6 @@ class Scraper
         return false;
     }
 
-    /**
-     * Returns an array of defined accepted image types, each in the form image/*
-     *
-     * @return array
-     */
-    public function getAcceptedTypes()
-    {
-        return array_map(
-            function ($value) {
-                return "image/" . $value;
-            },
-            $this->config['acceptedTypes']
-        );
-    }
 
     /**
      * Issues a HEAD call to URL which must be pointing to an image resource. If the response does not contain
@@ -107,6 +95,34 @@ class Scraper
         return sizeof($data);
     }
 
+
+    /**
+     * Returns the URL of the largest (in size) image on remote URL
+     *
+     * @param string $url
+     *
+     * @return null|string
+     */
+    public function getLargestImageUrl($url)
+    {
+        if ($this->isBlacklisted($url)) {
+            return null;
+        }
+        if ($this->isImage($url)) {
+            $this->logger->log(Logger::INFO, "Picture URL is image (" . $url . "). \n");
+            $this->count++;
+
+            return $url;
+        }
+        if ($this->config['imageLinksOnly']) {
+            $this->logger->log(Logger::NOTICE, "Only image links allowed, skipping url " . $url);
+
+            return null;
+        }
+
+        return $this->processImageArray($this->getImageSources($url));
+    }
+
     /**
      * Returns an array of all image sources ("img" tags) defined in remote URL
      *
@@ -114,7 +130,7 @@ class Scraper
      *
      * @return array
      */
-    public function getImageSources($url)
+    private function getImageSources($url)
     {
         $html = $this->getHtml($url);
 
@@ -153,33 +169,6 @@ class Scraper
     }
 
     /**
-     * Returns the URL of the largest (in size) image on remote URL
-     *
-     * @param string $url
-     *
-     * @return null|string
-     */
-    public function getLargestImageUrl($url)
-    {
-        if ($this->isBlacklisted($url)) {
-            return null;
-        }
-        if ($this->isImage($url)) {
-            $this->logger->log(Logger::INFO, "Picture URL is image (" . $url . "). \n");
-            $this->count++;
-
-            return $url;
-        }
-        if ($this->config['imageLinksOnly']) {
-            $this->logger->log(Logger::NOTICE, "Only image links allowed, skipping url " . $url);
-
-            return null;
-        }
-
-        return $this->processImageArray($this->getImageSources($url));
-    }
-
-    /**
      * Get the source of a remote URL
      *
      * @param string $url
@@ -195,6 +184,21 @@ class Scraper
         ]);
 
         return (string) $response->getBody();
+    }
+
+    /**
+     * Returns an array of defined accepted image types, each in the form image/*
+     *
+     * @return array
+     */
+    private function getAcceptedTypes()
+    {
+        return array_map(
+            function ($value) {
+                return "image/" . $value;
+            },
+            $this->config['acceptedTypes']
+        );
     }
 
     /**

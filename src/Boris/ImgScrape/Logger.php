@@ -17,7 +17,6 @@ class Logger
     const NOTICE = Monologger::NOTICE;
     const DEBUG = Monologger::DEBUG;
     const ERROR = Monologger::ERROR;
-
     /**
      *
      * @var array
@@ -34,10 +33,15 @@ class Logger
      *
      * @param array $config
      */
-    public function __construct(array $config)
+
+    public function __construct(array $config = null)
     {
-        $this->config = $config;
-        $this->createLogger($config['handlers']);
+        $this->config = require __DIR__ . '/config/config_logger.php';
+        if (is_array($config)) {
+            $this->config = array_replace_recursive($this->config, $config);
+        }
+
+        $this->createLogger($this->config['handlers']);
     }
 
     /**

@@ -1,21 +1,25 @@
 {
-    "name": "boris/imgscrape",
-    "type": "library",
-    "description": "Simple image scraper from remote URL to get the largest image",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Boris Pavlov",
-            "email": "borispavlov0@gmail.com"
-        }
-    ],
-    "require": {
-        "guzzlehttp/guzzle": "~5.0",
-        "monolog/monolog": "1.11.*@dev"
-    },
-    "autoload": {
-        "psr-0": {
-            "Boris\\ImgScrape\\": "src/"
-        }
+  "name": "boris/imgscrape",
+  "type": "library",
+  "description": "Simple image scraper from remote URL to get the largest image",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Boris Pavlov",
+      "email": "borispavlov0@gmail.com"
     }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "~5.0",
+    "monolog/monolog": "1.11.*@dev"
+  },
+  "require-dev": {
+    "mockery/mockery": "0.9.*@dev",
+    "phpunit/phpunit": "4.7.*@dev"
+  },
+  "autoload": {
+    "psr-0": {
+      "Boris\\ImgScrape\\": "src/"
+    }
+  }
 }

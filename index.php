@@ -3,8 +3,11 @@
 require 'vendor/autoload.php';
 $redditUrl = 'http://www.reddit.com';
 
+use Boris\ImgScrape\Logger;
 use Boris\ImgScrape\Scraper;
 use GuzzleHttp\Client;
+
+// This is just a reddit call to get some urls from the front page for this example
 
 $client = new Client(['base_url' => $redditUrl]);
 
@@ -35,10 +38,15 @@ $hotPosts = $client
         ])
     ->json();
 
-$scraper = new Scraper($client);
+// End irrelevant example
+
+
+// Start usage example:
+
+$scraper = new Scraper($client, new Logger());
 foreach ($hotPosts['data']['children'] as $post) {
     $url = $post['data']['url'];
-    $pictureUrl = $scraper->getLargestImageUrl($url);
+    $pictureUrl = $scraper->getLargestImageUrl($url);  //watch this magic right here!
 
     if ($pictureUrl) {
         exec(
