@@ -99,6 +99,13 @@ These can be used as your %scraper% parameters value and you only need to overri
         
 #Tests
 
+In order for tests to run, you need to include the following dependencies in your project for composer to install:
+
+    require-dev: {
+        "mockery/mockery": "0.9.*@dev",
+        "phpunit/phpunit": "4.7.*@dev"
+    }
+
 To run tests, navigate to the root directory of the project and run:
   
     phpunit --group=BorisImgScrape
