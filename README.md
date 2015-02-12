@@ -86,6 +86,7 @@ There is a default set of parameters that can be overridden when initializing th
     ];
     
 These can be used as your %scraper% parameters value and you only need to override what you need. Here is a reference on what each parameter means:
+
     scraper:
         imageLinksOnly: only returns the URL if the supplied URL is for and image
         acceptedTypes: accepted image mime types
