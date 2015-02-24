@@ -38,7 +38,7 @@ class Logger
     {
         $this->config = require __DIR__ . '/config/config_logger.php';
         if (is_array($config)) {
-            $this->config = array_replace_recursive($this->config, $config);
+            $this->config = array_merge_recursive($this->config, $config);
         }
 
         $this->createLogger($this->config['handlers']);
