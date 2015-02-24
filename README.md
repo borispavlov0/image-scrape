@@ -42,7 +42,7 @@ To use this component in Symfony, please register it as a service:
         
         boris.imgscrape:
           class: Boris\ImgScrape\Scraper
-          arguments: [@guzzle.client, %boris.scraper%]
+          arguments: [@guzzle.client, @boris.logger, %boris.scraper%]
         
         guzzle.client:
           class: GuzzleHttp\Client
