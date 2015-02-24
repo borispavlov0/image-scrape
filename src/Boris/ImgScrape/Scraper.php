@@ -43,7 +43,7 @@ class Scraper
     {
         $this->config = require __DIR__ . '/config/config.php';
         if (is_array($config)) {
-            $this->config = array_replace_recursive($this->config, $config);
+            $this->config = array_merge_recursive($this->config, $config);
         }
 //        $this->logger = new Logger($this->config['logger']);
         $this->client = $client;
